@@ -1,10 +1,11 @@
 "use client";
 
+import { PageSchema, Transaction, TransactionSchema } from '@/models';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { useEffect, useState } from 'react';
 
 export default function TransactionsTable() {
-  const [transactions, setTransactions] = useState([] as any[]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   const eurCurrencyFormatter = Intl.NumberFormat('fr-FR', {
     style: 'currency',
@@ -14,7 +15,8 @@ export default function TransactionsTable() {
   useEffect(() => {
     fetch(`${process.env.MYAFIM_API_URL}/transactions?limit=10`)
       .then(res => res.json())
-      .then(data => setTransactions(data.items as any[]));
+      .then(PageSchema(TransactionSchema).parse)
+      .then(data => setTransactions(data.items));
   }, []);
 
   return (
