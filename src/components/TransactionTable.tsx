@@ -32,6 +32,9 @@ export default function TransactionsTable() {
         <TableHeader>
           <TableRow>
             <TableHead className="w-120">Description</TableHead>
+            <TableHead className="w-80 text-right">Source account</TableHead>
+            <TableHead className="w-8 text-center">→</TableHead>
+            <TableHead className="w-80">Destination account</TableHead>
             <TableHead className="w-30 text-right">Amount</TableHead>
           </TableRow>
         </TableHeader>
@@ -39,6 +42,13 @@ export default function TransactionsTable() {
           {transactionPage.items.map(transaction => (
             <TableRow key={transaction.id}>
               <TableCell className="w-120">{transaction.description}</TableCell>
+              <TableCell className="w-80 text-right">
+                {`${transaction.sourceAccountName || 'N/A'}`}
+              </TableCell>
+              <TableCell className="w-8 text-center">→</TableCell>
+              <TableCell className="w-80">
+                {`${transaction.destinationAccountName || 'N/A'}`}
+              </TableCell>
               <TableCell className="w-30 text-right">{eurCurrencyFormatter.format(transaction.amount)}</TableCell>
             </TableRow>
           ))}
