@@ -42,6 +42,19 @@ const FormField = <
   )
 }
 
+const FormFieldNative = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({
+  ...props
+}: React.PropsWithChildren<Pick<ControllerProps<TFieldValues, TName>, "name" | 'control'>>) => {
+  return (
+    <FormFieldContext.Provider value={{ name: props.name }}>
+      {props.children}
+    </FormFieldContext.Provider>
+  )
+}
+
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext)
   const itemContext = React.useContext(FormItemContext)
@@ -164,4 +177,5 @@ export {
   FormDescription,
   FormMessage,
   FormField,
+  FormFieldNative,
 }
