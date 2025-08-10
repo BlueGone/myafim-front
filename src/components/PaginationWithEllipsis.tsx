@@ -12,28 +12,30 @@ export default function PaginationWithEllipsis({ currentPage, setCurrentPage, to
   return (
     <Pagination>
       <PaginationContent>
-        {currentPage > 1 && (
-          <PaginationItem key="prev">
-            <PaginationPrevious href="#" onClick={() => setCurrentPage(currentPage - 1)} />
-          </PaginationItem>
-        )}
+        <PaginationItem key="prev">
+          <PaginationPrevious disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)} />
+        </PaginationItem>
 
         {
           makePaginationItemRepresentations({ currentPage, totalPages })
             .map(paginationItem => renderPaginationWithEllipsisRepr({ currentPage, setCurrentPage, paginationItem }))
         }
 
-        {currentPage < totalPages && (
-          <PaginationItem key="next">
-            <PaginationNext href="#" onClick={() => setCurrentPage(currentPage + 1)} />
-          </PaginationItem>
-        )}
+        <PaginationItem key="next">
+          <PaginationNext disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)} />
+        </PaginationItem>
       </PaginationContent>
     </Pagination>
   );
 }
 
-function renderPaginationWithEllipsisRepr({ currentPage, setCurrentPage, paginationItem }: { currentPage: number; setCurrentPage: (page: number) => void; paginationItem: PaginationItemRepresentation }) {
+function renderPaginationWithEllipsisRepr({
+  currentPage,
+  setCurrentPage,
+  paginationItem
+}: Pick<PaginationWithEllipsisProps, "currentPage" | "setCurrentPage"> & {
+  paginationItem: PaginationItemRepresentation
+}) {
   if (paginationItem === "pre_ellipsis" ||
       paginationItem === "post_ellipsis") {
     return <PaginationItem key={paginationItem}>
@@ -41,39 +43,25 @@ function renderPaginationWithEllipsisRepr({ currentPage, setCurrentPage, paginat
     </PaginationItem>;
   }
   if (paginationItem === currentPage) {
-    return <PaginationItem key={paginationItem}>
-      <PaginationLink href="#" isActive>{paginationItem}</PaginationLink>
+    return <PaginationItem key={'active'}>
+      <PaginationLink isActive>{paginationItem}</PaginationLink>
     </PaginationItem>;
   }
   return <PaginationItem key={paginationItem}>
-    <PaginationLink href="#" onClick={() => setCurrentPage(paginationItem)}>{paginationItem}</PaginationLink>
+    <PaginationLink onClick={() => setCurrentPage(paginationItem)}>{paginationItem}</PaginationLink>
   </PaginationItem>;
 }
 
 function makePaginationItemRepresentations({ currentPage, totalPages }: Pick<PaginationWithEllipsisProps, "currentPage" | "totalPages">): PaginationItemRepresentation[] {
-  const result: PaginationItemRepresentation[] = []
-
-  if (currentPage > 1) {
-    result.push(1)
-  }
-  if (currentPage >= 4) {
-    result.push(currentPage === 4 ? 2 : "pre_ellipsis")
-  }
-  if (currentPage > 2) {
-    result.push(currentPage - 1)
+  if (totalPages <= 7) {
+    return [1, 2, 3, 4, 5, 6, 7];
   }
 
-  result.push(currentPage)
-
-  if (currentPage < totalPages - 1) {
-    result.push(currentPage + 1)
+  if (currentPage <= 4) {
+    return [1, 2, 3, 4, 5, "post_ellipsis", totalPages];
+  } else if (currentPage >= totalPages - 3) {
+    return [1, "pre_ellipsis", totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+  } else {
+    return [1, "pre_ellipsis", currentPage - 1, currentPage, currentPage + 1, "post_ellipsis", totalPages];
   }
-  if (currentPage <= totalPages - 3) {
-    result.push(currentPage === totalPages - 3 ? totalPages - 1 : "post_ellipsis")
-  }
-  if (currentPage < totalPages) {
-    result.push(totalPages)
-  }
-
-  return result
 }
