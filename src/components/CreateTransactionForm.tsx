@@ -4,6 +4,9 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "./ui/button";
 import { CreateTransactionRequest, createTransactionRequestSchema } from "@/models";
+import { Input } from "./ui/input";
+import { FormControl, FormItem, FormLabel, Form, FormFieldNative } from "./ui/form";
+import { Loader2Icon } from "lucide-react";
 
 export const CreateTransactionForm = () => {
   const createTransactionForm = useForm({
@@ -11,35 +14,46 @@ export const CreateTransactionForm = () => {
     resolver: zodResolver(createTransactionRequestSchema)
   });
 
-  const { isSubmitting, isValid } = createTransactionForm.formState;
-  const isDisabled = isSubmitting || !isValid;
+  const { isSubmitting } = createTransactionForm.formState;
 
   return (
-    <form onSubmit={createTransactionForm.handleSubmit(data => !isDisabled && onSubmit(data))}>
-      <div>
-        <label>
-          Amount
-          <input type="number" step="0.01" {...createTransactionForm.register("amount", { setValueAs: parseFloat })} />
-        </label>
-      </div>
-      <div>
-        <label>
-          Description
-          <input type="text" {...createTransactionForm.register("description")} />
-        </label>
-      </div>
-      <div>
-        <label>
-          Date
-          <input type="date" {...createTransactionForm.register("date")} />
-        </label>
-      </div>
-      <div>
-        <Button type="submit" disabled={isDisabled}>
-          {isSubmitting ? "Creating..." : "Create Transaction"}
-        </Button>
-      </div>
-    </form>
+    <Form {...createTransactionForm}>
+      <form onSubmit={createTransactionForm.handleSubmit(onSubmit)} className="grid gap-4">
+        <FormFieldNative name="amount">
+          <FormItem>
+            <FormLabel>Amount</FormLabel>
+            <FormControl>
+              <Input type="text" {...createTransactionForm.register("amount", { setValueAs: v => v && parseFloat(v) })} />
+            </FormControl>
+          </FormItem>
+        </FormFieldNative>
+
+        <FormFieldNative name="description">
+          <FormItem>
+            <FormLabel>Description</FormLabel>
+            <FormControl>
+              <Input type="text" {...createTransactionForm.register("description")} />
+            </FormControl>
+          </FormItem>
+        </FormFieldNative>
+
+        <FormFieldNative name="date">
+          <FormItem>
+            <FormLabel>Date</FormLabel>
+            <FormControl>
+              <Input type="date" {...createTransactionForm.register("date")} />
+            </FormControl>
+          </FormItem>
+        </FormFieldNative>
+
+        <FormItem>
+          <Button type="submit" disabled={isSubmitting} >
+            {isSubmitting && <Loader2Icon className="animate-spin" />}
+            Create transaction
+          </Button>
+        </FormItem>
+      </form>
+    </Form>
   );
 }
 
