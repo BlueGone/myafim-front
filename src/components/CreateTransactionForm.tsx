@@ -3,10 +3,11 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "./ui/button";
-import { CreateTransactionRequest, createTransactionRequestSchema } from "@/models";
+import { createTransactionRequestSchema } from "@/models";
 import { Input } from "./ui/input";
 import { FormControl, FormItem, FormLabel, Form, FormFieldNative } from "./ui/form";
 import { Loader2Icon } from "lucide-react";
+import { createTransaction } from "@/lib/api/transactions";
 
 export const CreateTransactionForm = () => {
   const createTransactionForm = useForm({
@@ -18,7 +19,7 @@ export const CreateTransactionForm = () => {
 
   return (
     <Form {...createTransactionForm}>
-      <form onSubmit={createTransactionForm.handleSubmit(onSubmit)} className="grid gap-4">
+      <form onSubmit={createTransactionForm.handleSubmit(createTransaction)} className="grid gap-4">
         <FormFieldNative name="amount">
           <FormItem>
             <FormLabel>Amount</FormLabel>
@@ -55,14 +56,4 @@ export const CreateTransactionForm = () => {
       </form>
     </Form>
   );
-}
-
-function onSubmit(data: CreateTransactionRequest): Promise<unknown> {
-  return fetch(`${process.env.MYAFIM_API_URL}/transactions`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
 }

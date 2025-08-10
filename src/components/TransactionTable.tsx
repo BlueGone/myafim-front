@@ -1,9 +1,10 @@
 "use client";
 
-import { Page, PageSchema, Transaction, TransactionSchema } from '@/models';
+import { Page, Transaction } from '@/models';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import { useEffect, useState } from 'react';
 import PaginationWithEllipsis from './PaginationWithEllipsis';
+import { listTransactions } from '@/lib/api/transactions';
 
 export default function TransactionsTable() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -16,10 +17,8 @@ export default function TransactionsTable() {
   });
   
   useEffect(() => {
-    fetch(`${process.env.MYAFIM_API_URL}/transactions?limit=10&page=${currentPage}`)
-      .then(res => res.json())
-      .then(PageSchema(TransactionSchema).parse)
-      .then(data => setTransactionPage(data));
+    listTransactions({ page: currentPage, limit: 10 })
+      .then(data => setTransactionPage(data))
   }, [currentPage]);
   
   if (!transactionPage) {
