@@ -6,72 +6,74 @@ interface PaginationWithEllipsisProps {
   setCurrentPage: (page: number) => void;
 }
 
+type PaginationItemRepresentation = number | "pre_ellipsis" | "post_ellipsis";
+
 export default function PaginationWithEllipsis({ currentPage, setCurrentPage, totalPages }: PaginationWithEllipsisProps) {
   return (
     <Pagination>
       <PaginationContent>
         {currentPage > 1 && (
-          <>
-            <PaginationItem>
-              <PaginationPrevious href="#" onClick={() => setCurrentPage(currentPage - 1)} />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink href="#" onClick={() => setCurrentPage(1)}>1</PaginationLink>
-            </PaginationItem>
-          </>
-        )}
-
-        {currentPage === 4 && (
-          <PaginationItem>
-            <PaginationLink href="#" onClick={() => setCurrentPage(2)}>2</PaginationLink>
+          <PaginationItem key="prev">
+            <PaginationPrevious href="#" onClick={() => setCurrentPage(currentPage - 1)} />
           </PaginationItem>
         )}
 
-        {currentPage > 4 && (
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
-        )}
-
-        {currentPage > 2 && (
-          <PaginationItem>
-            <PaginationLink href="#" onClick={() => setCurrentPage(currentPage - 1)}>{currentPage - 1}</PaginationLink>
-          </PaginationItem>
-        )}
-
-        <PaginationItem>
-          <PaginationLink href="#" isActive>{currentPage}</PaginationLink>
-        </PaginationItem>
-
-        {currentPage < totalPages - 1 &&  (
-          <PaginationItem>
-            <PaginationLink href="#" onClick={() => setCurrentPage(currentPage + 1)}>{currentPage + 1}</PaginationLink>
-          </PaginationItem>
-        )}
-
-        {currentPage === totalPages - 3 && (
-          <PaginationItem>
-            <PaginationLink href="#" onClick={() => setCurrentPage(totalPages - 1)}>{totalPages - 1}</PaginationLink>
-          </PaginationItem>
-        )}
-
-        {currentPage < totalPages - 3 && (
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
-        )}
+        {
+          makePaginationItemRepresentations({ currentPage, totalPages })
+            .map(paginationItem => renderPaginationWithEllipsisRepr({ currentPage, setCurrentPage, paginationItem }))
+        }
 
         {currentPage < totalPages && (
-          <>
-            <PaginationItem>
-              <PaginationLink href="#" onClick={() => setCurrentPage(totalPages)}>{totalPages}</PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationNext href="#" onClick={() => setCurrentPage(currentPage + 1)} />
-            </PaginationItem>
-          </>
+          <PaginationItem key="next">
+            <PaginationNext href="#" onClick={() => setCurrentPage(currentPage + 1)} />
+          </PaginationItem>
         )}
       </PaginationContent>
     </Pagination>
   );
+}
+
+function renderPaginationWithEllipsisRepr({ currentPage, setCurrentPage, paginationItem }: { currentPage: number; setCurrentPage: (page: number) => void; paginationItem: PaginationItemRepresentation }) {
+  if (paginationItem === "pre_ellipsis" ||
+      paginationItem === "post_ellipsis") {
+    return <PaginationItem key={paginationItem}>
+      <PaginationEllipsis />
+    </PaginationItem>;
+  }
+  if (paginationItem === currentPage) {
+    return <PaginationItem key={paginationItem}>
+      <PaginationLink href="#" isActive>{paginationItem}</PaginationLink>
+    </PaginationItem>;
+  }
+  return <PaginationItem key={paginationItem}>
+    <PaginationLink href="#" onClick={() => setCurrentPage(paginationItem)}>{paginationItem}</PaginationLink>
+  </PaginationItem>;
+}
+
+function makePaginationItemRepresentations({ currentPage, totalPages }: Pick<PaginationWithEllipsisProps, "currentPage" | "totalPages">): PaginationItemRepresentation[] {
+  const result: PaginationItemRepresentation[] = []
+
+  if (currentPage > 1) {
+    result.push(1)
+  }
+  if (currentPage >= 4) {
+    result.push(currentPage === 4 ? 2 : "pre_ellipsis")
+  }
+  if (currentPage > 2) {
+    result.push(currentPage - 1)
+  }
+
+  result.push(currentPage)
+
+  if (currentPage < totalPages - 1) {
+    result.push(currentPage + 1)
+  }
+  if (currentPage <= totalPages - 3) {
+    result.push(currentPage === totalPages - 3 ? totalPages - 1 : "post_ellipsis")
+  }
+  if (currentPage < totalPages) {
+    result.push(totalPages)
+  }
+
+  return result
 }
